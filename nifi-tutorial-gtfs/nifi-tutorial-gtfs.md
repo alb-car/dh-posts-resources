@@ -65,6 +65,44 @@ Click *APPLY* and, once NiFi is done updating changes, click *CLOSE*. We are rea
 
 We will include creation of the recipient table in the flow, to learn something more and ensure the table is compatible with this tutorial.
 
-Drag the <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> icon from the top menu bar to the square-patterned area and release it. The *Add Processor* prompt will appear. This is where the processor type is selected. Type “*ExecuteSQL*” to filter the list and double click on the **ExecuteSQL** entry.
+<img align="right" width="300" height="201" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_add.png">
 
-The processor will appear on the flow. This type of processor executes a query on a database. Double click on the processor to configure it.
+Drag the <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> icon from the top menu bar to the square-patterned area and release it. The *Add Processor* prompt will appear. This is where the processor type is selected. Type “*executesql*” to filter the list and double click on the **ExecuteSQL** entry.
+
+The processor will appear on the flow. This type of processor executes a query on a database.
+
+Double click on the processor to configure it.
+
+<img align="right" width="300" height="100" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_settings.png">
+
+In the ***SETTINGS*** tab, put a check mark on ***failure***, under *Automatically Terminate Relationships*, on the right side. This means that, if the operation fails, the processor should not forward the data to any of the processors we will add later.
+
+In the ***SCHEDULING*** tab, insert ***1 day*** under *Run Schedule*. The processor would execute once every 24 hours, starting from the moment we will decide to run it. Once the flow is complete and its execution finished, we will stop all processors, so we will not actually let it execute daily.
+
+<img align="right" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_scheduling.png">
+
+**It is however important to set it to 1 day**: if the default value, *0 sec*, is not changed on the first processor, NiFi would attempt to execute this processor as many times as possible. While it wouldn't cause any damage with this tutorial, **imagine if the first processor were to query a pay-per-use API: forgetting to set this value properly may cause thousands of useless queries, in just a few seconds, that give the same result but cost a lot of money**.
+
+*0 sec* on any non-root processor simply means that the processor should execute as soon as upstream data is available, so we only need to worry about this property for the first processor.
+
+The ***PROPERTIES*** tab is the most unique, where configuration differs depending on processor type. **Bold** properties are required, while non-bold ones are optional. Most properties have a default value anyway, so we will only change a few of them.
+
+Next to *Database Connection Pooling Service*, click on *No value set* to display a drop-down menu: drop down the selection and pick *Create new service...*. The *Add Controller Service* prompt will be displayed. We will use the default controller service, so click CREATE.
+
+You will notice the property now has the value *DBCPConnectionPool*. We need to configure this controller, so click on the arrow on the right.
+
+***Controller services*** offer a service that may be used by different processors. This one offers a connection to a database. We will also later use this same controller service for another processor, but we only need to configure it once.
+
+Click on to open the configuration panel and switch to the *PROPERTIES* tab.
+
+The *Database Connection URL* format depends on the database you plan on using for storing the data. In this tutorial, we will use Postgres, so the format is as follows:
+```
+jdbc:postgresql://<host>:<port>/<database_name>
+```
+For example, if the database is hosted locally, at default port *5432*, and the database is called *public_transport*:
+```
+jdbc:postgresql://localhost:5432/public_transport
+```
+For *Database Driver Class Name* enter `org.postgresql.Driver`, while for *Database Driver Location(s)* enter `https://jdbc.postgresql.org/download/postgresql-42.2.7.jar`. Values for *Database User* and *Password* depend on how your Postgres user is configured. If you set up a fresh Postgres installation for the tutorial, user and password are both `postgres` by default. You will notice NiFi later hides the value for *Password*.
+
+Click *APPLY* and a icon will appear: click it and click *ENABLE*. Close all prompts and double-click on the processor again so that we can finish configuring it.
