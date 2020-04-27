@@ -39,9 +39,9 @@ Right-click in the square-patterned area and click *Configure*. Switch to the *G
 
 The *Add Parameter Context* prompt will appear, with the *SETTINGS* tab selected. Enter any *Name* (for example, ***Public Transport***), then switch to the *PARAMETERS* tab. Click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> and the *Add Parameter* prompt will show up.
 
-<img align="right" width="400" height="119" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_parameters.png">
-
 Type ***schema*** for *Name* and ***trento*** for *Value*. *Sensitive Value* indicates whether the value should be hidden, while *Description* is purely for convenience. There is no need to change these two properties.
+
+<img align="right" width="260" height="143" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_parameters.png">
 
 Click *APPLY*, then click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> again and add another parameter named ***routes_table*** with value ***lines***.
 
