@@ -8,14 +8,14 @@ The only requirements are:
 -	**Access to a database**. This tutorial is written using Postgres as an example, but any similar database will be fine, as only simple features will be used. No knowledge of SQL is required.
 
 ## Scenario
-We want to download a *GTFS* (standard format for data related to public transportation) file, perform minor adaptations to it, and store it into a database.
+We will download a *GTFS* (standard format for data related to public transportation) file of the Italian city of Trento, perform minor adaptations to it, and store it into a database.
 
 We will design a process with NiFi that creates the recipient table on a Postgres database, requests and downloads the file from its HTTP address, interprets and alters the data within, and finally stores it into the recipient table.
 
 ## Building the flow
 The basic building brick in NiFi is a ***processor***, a unit that performs a single operation on data (retrieval, modification, routing, storing, etc.).
 
-We will now proceed to build a chain of processors, called ***flow***, to cover our designed scenario.
+We will build a chain of processors, called ***flow***, to cover our designed scenario.
 
 Access your NiFi instance. Drag the <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_pg.png"> icon from the top menu bar to the square-patterned area, enter a name (for example, “Handle GTFS”) and click *ADD*.
 <img align="right" width="280" height="131" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_pg.png">
@@ -23,7 +23,27 @@ Access your NiFi instance. Drag the <img width="22" height="22" src="https://git
 A rectangle will appear in the square-patterned area: this is a ***process group***, which we will use to keep our flows neatly organized. You can think of it as equivalent to a folder on your computer’s file system.
 
 Double click on the process group to enter it. The path on the bottom will change. This is where we will create the flow.
+
+Before adding processors, we will create some parameters/variables.
 <img align="right" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_path.png">
+
+### Parameters/Variables
+Parameters and variables are handy to keep multiple values configured in a single place. The flow will refer to these parameters/variables, so if we decide to change a value, we only have to update the parameter/variable once and every occurrence of it will use its new value.
+
+#### Parameters
+**Parameters** were introduced in **version 1.10**, with the intent of replacing variables. Users with versions >=1.10 should use parameters, while **users of previous versions should skip to the next paragraph** to add variables.
+
+Right-click in the square-patterned area and click *Configure*. Switch to the *GENERAL* tab, expand *Process Group Parameter Context* and click *Create new parameter context...*.
+
+The *Add Parameter Context* prompt will appear, with the *SETTINGS* tab selected. Enter any *Name* (for example, ***Public Transport***), then switch to the *PARAMETERS* tab. Click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button-plus.png"> and the *Add Parameter* prompt will show up.
+
+Type ***schema*** for *Name* and ***trento*** for *Value*. *Sensitive Value* indicates whether the value should be hidden, while *Description* is purely for convenience. There is no need to change these two properties.
+
+Click *APPLY*, then click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button-plus.png"> again and add another parameter named ***routes_table*** with value ***lines***.
+
+The two parameters' values will be used with Postgres, which tends to force names to lower-case. It is possible to use upper-case characters, but to keep things simple, make sure both ***trento*** and ***lines*** are lower-case.
+
+Click **APPLY** until NiFi says "*Process group configuration successfully saved.*", then click *OK* and close the *Handle GTFS Configuration* prompt.
 
 ### 1. Root processor: creating the recipient table
 **Recipient tables are usually created separately, outside of NiFi**. Normally, NiFi’s role is to automatically retrieve, adapt and store data, while preparing the recipient system is a one-time ordeal handled manually or with a different tool.
