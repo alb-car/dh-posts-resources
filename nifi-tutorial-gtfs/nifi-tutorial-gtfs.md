@@ -87,13 +87,17 @@ In the ***SCHEDULING*** tab, insert ***1 day*** under *Run Schedule*. The proces
 
 The ***PROPERTIES*** tab is the most unique, where configuration differs depending on processor type. **Bold** properties are required, while non-bold ones are optional. Most properties have a default value anyway, so we will only change a few of them.
 
+<img align="right" width="260" height="232" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_add_cs.png">
+
 Next to *Database Connection Pooling Service*, click on *No value set* to display a drop-down menu: drop down the selection and pick *Create new service...*. The *Add Controller Service* prompt will be displayed. We will use the default controller service, so click CREATE.
 
 You will notice the property now has the value *DBCPConnectionPool*. We need to configure this controller, so click on the arrow on the right.
 
+<img width="500" height="41" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_property_set.png">
+
 ***Controller services*** offer a service that may be used by different processors. This one offers a connection to a database. We will also later use this same controller service for another processor, but we only need to configure it once.
 
-Click on to open the configuration panel and switch to the *PROPERTIES* tab.
+Click on <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_gear.png">, on the far right, to open the configuration panel and switch to the *PROPERTIES* tab.
 
 The *Database Connection URL* format depends on the database you plan on using for storing the data. In this tutorial, we will use Postgres, so the format is as follows:
 ```
@@ -103,6 +107,11 @@ For example, if the database is hosted locally, at default port *5432*, and the 
 ```
 jdbc:postgresql://localhost:5432/public_transport
 ```
-For *Database Driver Class Name* enter `org.postgresql.Driver`, while for *Database Driver Location(s)* enter `https://jdbc.postgresql.org/download/postgresql-42.2.7.jar`. Values for *Database User* and *Password* depend on how your Postgres user is configured. If you set up a fresh Postgres installation for the tutorial, user and password are both `postgres` by default. You will notice NiFi later hides the value for *Password*.
 
-Click *APPLY* and a icon will appear: click it and click *ENABLE*. Close all prompts and double-click on the processor again so that we can finish configuring it.
+<img align="right" width="400" height="189" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_config_cs.png">
+
+For *Database Driver Class Name* enter `org.postgresql.Driver`, while for *Database Driver Location(s)* enter `https://jdbc.postgresql.org/download/postgresql-42.2.7.jar`.
+
+Values for *Database User* and *Password* depend on how your Postgres user is configured. If you set up a fresh Postgres installation for the tutorial, user and password are both `postgres` by default. You will notice NiFi later hides the value for *Password*.
+
+Click *APPLY* and a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_enable.png"> icon will appear: click it and click *ENABLE*. Close all prompts and double-click on the processor again so that we can finish configuring it.
