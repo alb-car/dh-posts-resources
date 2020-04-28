@@ -11,7 +11,7 @@ The only requirements are:
 
 ## Scenario
 
-We will download a *GTFS* (standard format for data related to public transportation) file of the Italian city of Trento, perform minor adaptations to it, and store it into a database.
+We will download a [GTFS](https://developers.google.com/transit/gtfs/) (standard format for data related to public transportation) file of the Italian city of Trento, perform minor adaptations to it, and store it into a database.
 
 We will design a process with NiFi that creates the recipient table on a Postgres database, requests and downloads the file from its HTTP address, interprets and alters the data within, and finally stores it into the recipient table.
 
@@ -22,6 +22,8 @@ GTFS data usually comes as a zipped folder, containing multiple text files with 
 The basic building brick in NiFi is a ***processor***, a unit that performs a single operation on data (retrieval, modification, routing, storing, etc.).
 
 We will build a chain of processors, called ***flow***, to cover our designed scenario.
+
+NiFi saves the flow's status at every change, so you do not need to worry about saving your progress as you build the flow.
 
 Access your NiFi instance. Drag the <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_pg.png"> icon from the top menu bar to the square-patterned area, enter a name (for example, “Handle GTFS”) and click *ADD*.
 <img align="right" width="280" height="131" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_pg.png">
@@ -187,7 +189,7 @@ Since we're performing a simple *GET* request, all we need to change is the ***R
 ```
 http://www.ttesercizio.it/opendata/google_transit_urbano_tte.zip
 ```
-This address will return a *.zip* file containing GTFS data for the Italian city of Trento. GTFS is a common standard for public transport data, so if this address is unavailable, you may look up data for a different city instead.
+This address will return a *.zip* file containing [GTFS data for the Italian city of Trento](http://www.ttesercizio.it/opendata/google_transit_urbano_tte.zip). GTFS is a common standard for public transport data, so if this address is unavailable, you may look up data for a different city instead.
 
 Configuration for this processor is complete.
 
@@ -231,6 +233,8 @@ Check the only box available, *unmatched*. We will create a new relationship ass
 
 Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property: its name will be ***routes*** and its value will be `${filename:equals('routes.txt')}`.
 
+The `${...}` notation signals the use of [NiFi's Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html), a powerful tool to reference and manipulate flowfile attributes, though not needed for this tutorial, outside of this instance.
+
 After you click *APPLY*, this will create another relationship, named *routes*, to which flowfiles will be routed when their *filename* is equal to *routes.txt*.
 
 By adding another, equivalent property, for example for *stops.txt*, you would create an additional relationship, that you could use to direct the *stops.txt* file to a different path.
@@ -255,7 +259,7 @@ Before regular properties, we need to create 3 controller services (for ***Recor
 
 ##### Record Reader
 
-<img align="right" width="250" height="134" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_save.png">
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_save.png">
 
 Click on *No value set*, expand the drop-down list and choose *Create new service...*. From the Add Controller Prompt, drop-down the *Compatible Controller Services* drop-down list and pick ***CSVReader***, then hit *CREATE*. Click <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_arrow.png"> to move to the configuration screen, answering *YES* to the prompt asking you to save changes.
 
@@ -273,7 +277,7 @@ Add a ***CSVRecordSetWriter*** controller service: no need to configure it, sinc
 
 Pick ***SimpleKeyValueLookupService*** (scroll down to find it) and move to configure it. We have to create properties that will tell the processor what number should be replaced with what word.
 
-<img align="right" width="250" height="274" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_map.png">
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_map.png">
 
 Add the following properties (name - value):
 - 0 - tram
@@ -291,9 +295,87 @@ Set ***Result RecordPath*** to ***/route_type***. This property tells the proces
 
 Click *APPLY*, enable both ***CSVRecordSetWriter*** and ***SimpleKeyValueLookupService*** and return to processor configuration.
 
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_config.png">
+
 Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property, named ***key*** with value ***/route_type***. This is the field used as a key in the look-up process.
 
 Since we no longer need the vehicle-identifier number after mapping it to a self-explanatory word, *route_type* acts both as key and target of the mapping process. Click *APPLY*.
 
 ---
 ### 6. Specific modifications to data
+
+Add a ***QueryRecord*** processor and connect *LookupRecord* to it through the ***success*** relationship. This processor allows us to run a query on a record-oriented flowfile, as if it was a table in a database.
+
+#### SETTINGS
+
+Check *failure* and *original*. We will define a property to create another relationship.
+
+#### PROPERTIES
+
+For ***Record Reader***, set the same ***CSVReader*** you created for the previous processor.
+
+Similarly, for ***Record Writer***, set the same ***CSVRecordSetWriter***.
+
+Add a new property, named ***adapted***, and copy and paste the following query as its value:
+```
+SELECT
+  route_short_name AS line_id,
+  route_type AS type,
+  route_long_name AS full_name,
+  route_short_name || ' - ' || SUBSTRING(route_long_name, 1, 10) AS shortened
+FROM FLOWFILE
+```
+This query changes the columns' names to match our table, discards fields we do not need, and also creates an additional field, by concatenating line identifier with a substring of the name, that matches the ***shortened*** column of our table.
+
+Click *APPLY* and let's add the last processor.
+
+---
+### 7. Insert data into the database
+
+Add a ***PutDatabaseRecord*** processor and connect *QueryRecord* to it through the ***adapted*** relationship. This processor takes record-oriented data, interprets it, and stores it into a database table.
+
+#### SETTINGS
+
+**Put a check mark on all relationships**. It's the last processor of the flow, so we do not need to forward its output anywhere, even if successful.
+
+#### PROPERTIES
+
+<img align="right" width="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_7_config.png">
+
+Set ***Record Reader*** to the ***CSVReader*** you already created.
+
+Set ***Statement Type*** to ***INSERT***, since we will be inserting new records.
+
+Set ***Database Connection Pooling Service*** to the ***DBCPConnectionPool*** you created earlier.
+
+Set ***Schema Name*** to ***#{schema}*** (replace ***#*** with ***$*** if you're using variables).
+
+Set ***Table Name*** to ***#{routes_table}*** replace ***#*** with ***$*** if you're using variables).
+
+Click *APPLY*. The flow is complete and ready to run!
+
+## Running the flow
+
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_full_flow.png">
+
+All processors should have a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png"> icon on them. If you find a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png">, hover on it to see what's wrong.
+
+Once you're ready, right-click in the square-patterned area outside any processor, and click ***Start*** to start all processors.
+
+NiFi's UI reloads automatically after about 30 seconds, so force a reload by right-clicking in the square-patterned area and clicking ***Refresh***.
+
+The icon for all processors should change from <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png"> to <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_run.png">
+
+Refresh a few times, and soon you can see that, in the status bar, the two leftmost values are equal to 0, indicating respectively that no processors are processing files anymore and that there are no remaining files yet to process.
+
+<img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_status.png">
+
+This means your flow has finished execution. and is now waiting for the *1 day* scheduled interval to pass. Right-click on the square-patterned area and click ***Stop*** to stop all processors.
+
+If everything went well, you should now find in your database a new table, named ***lines*** in the new ***trento*** schema, containing several records, with the columns as we defined them earlier!
+
+If any processor displays the error symbol <img width="14" height="14" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_err.png"> in the corner, something went wrong. Common issues may be an incorrect configuration of the **controller services**, especially DBCPConnectionPool, forgetting to set a **parameter/variable**, or an incorrect value for a **property**.
+
+Hover on the error icon to see what's wrong and check the processor's corresponding section in this tutorial.
+
+We hope that this tutorial has given you the tools to start building your own NiFi flows! 
