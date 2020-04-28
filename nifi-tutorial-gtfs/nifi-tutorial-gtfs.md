@@ -1,13 +1,16 @@
 # NiFi tutorial: Designing a flow for a real use case
+
 This tutorial provides a step-by-step guide on how to use Apache NiFi for a simple, but realistic use case.
 
 ## Requirements
+
 No prior experience with NiFi and its user interface is required, as every concept will be briefly introduced when necessary.
 The only requirements are:
 -	**An instance of Apache NiFi**. This tutorial is written with version 1.11 as basis, but should be valid for many prior versions.
 -	**Access to a database**. This tutorial is written using Postgres as an example, but any similar database will be fine, as only simple features will be used. No knowledge of SQL is required.
 
 ## Scenario
+
 We will download a *GTFS* (standard format for data related to public transportation) file of the Italian city of Trento, perform minor adaptations to it, and store it into a database.
 
 We will design a process with NiFi that creates the recipient table on a Postgres database, requests and downloads the file from its HTTP address, interprets and alters the data within, and finally stores it into the recipient table.
@@ -15,6 +18,7 @@ We will design a process with NiFi that creates the recipient table on a Postgre
 GTFS data usually comes as a zipped folder, containing multiple text files with the same format but different contents (data on routes, stops, etc.). For simplicity, we will focus on the **routes.txt** file, which contains general information on the routes provided by public transportation lines.
 
 ## Building the flow
+
 The basic building brick in NiFi is a ***processor***, a unit that performs a single operation on data (retrieval, modification, routing, storing, etc.).
 
 We will build a chain of processors, called ***flow***, to cover our designed scenario.
@@ -30,9 +34,11 @@ Before adding processors, we will create some parameters/variables.
 <img align="right" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_path.png">
 
 ### Parameters/Variables
+
 Parameters and variables are handy to keep multiple values configured in a single place. The flow will refer to these parameters/variables, so if we decide to change a value, we only have to update the parameter/variable once and every occurrence of it will use its new value.
 
 #### Parameters
+
 <img align="right" width="200" height="233" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_config.png">
 
 **Parameters** were introduced in **version 1.10**, with the intent of replacing variables. Users with versions >=1.10 should use parameters, while **users of previous versions should skip to the next paragraph** to add variables.
@@ -52,6 +58,7 @@ The two parameters' values will be used with Postgres, which tends to force name
 Click **APPLY** until NiFi says "*Process group configuration successfully saved.*", then click *OK* and close the *Handle GTFS Configuration* prompt. Skip the *Variables* paragraph and we will start adding processors to the flow.
 
 #### Variables
+
 Right-click in the square-patterned area and click **Variables**. The *Variables* prompt will appear.
 
 Click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> and the *New Variable* prompt will appear. Insert ***schema*** for *Variable Name*, click *OK* and insert ***trento*** in the white box that appears, then click *OK*.
@@ -62,7 +69,9 @@ The two parameters' values will be used with Postgres, which tends to force name
 
 Click *APPLY* and, once NiFi is done updating changes, click *CLOSE*. We are ready to start adding processors to the flow.
 
-### 1. Root processor: creating the recipient table
+---
+### 1. Root processor: create the recipient table
+
 **Recipient tables are usually created separately, outside of NiFi**. Normally, NiFi’s role is to automatically retrieve, adapt and store data, while preparing the recipient system is a one-time ordeal handled manually or with a different tool.
 
 We will include creation of the recipient table in the flow, to learn something more and ensure the table is compatible with this tutorial.
@@ -99,7 +108,7 @@ The ***PROPERTIES*** tab is the most unique, where configuration differs dependi
 
 Next to *Database Connection Pooling Service*, click on *No value set* to display a drop-down menu: drop down the selection and pick *Create new service...*. The *Add Controller Service* prompt will be displayed. We will use the default controller service, so click CREATE.
 
-You will notice the property now has the value *DBCPConnectionPool*. We need to configure this controller, so click on the arrow on the right.
+You will notice the property now has the value *DBCPConnectionPool*. We need to configure this controller, so click on the arrow on the right, confirming that you want to save changes along the way.
 
 <img width="500" height="41" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_property_set.png">
 
@@ -147,7 +156,8 @@ The command above will create a schema and a table. As mentioned before, we will
 
 Click *APPLY*. The processor is fully configured, but still displays a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> icon: we need to direct *successful* output of this root processor to a new processor.
 
-### 2. Obtaining the data with a HTTP request
+---
+### 2. Obtain data with a HTTP request
 Add a new processor, of *InvokeHTTP* type, by dragging <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> to the square-patterned area and typing "*invokehttp*" as filter.
 
 <img align="left" width="293" height="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_2_add_rel.png">
@@ -181,7 +191,8 @@ This address will return a *.zip* file containing GTFS data for the Italian city
 
 Configuration for this processor is complete.
 
-### 3. Unpacking the obtained *.zip* file
+---
+### 3. Unpack the *.zip* file
 
 <img align="right" width="250" height="374" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_3_flow.png">
 
@@ -201,7 +212,8 @@ Don't change ***File Filter***: it's to extract only specific files from the arc
 
 In addition, this allows us to introduce the next processor, which is an important one.
 
-### 4. Routing flowfiles
+---
+### 4. Route flowfiles
 
 Add a ***RouteOnAttribute*** processor and connect *UnpackContent* to it through the ***success*** relationship. This new processor allows you to make the flowfiles follow a different path in the flow, depending on different factors, such as the values of their attributes.
 
@@ -217,8 +229,71 @@ Check the only box available, *unmatched*. We will create a new relationship ass
 
 <img align="right" width="250" height="54" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_4_properties.png">
 
-Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> to add a new property: its name will be ***routes*** and its value will be `${filename:equals('routes.txt')}`.
+Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property: its name will be ***routes*** and its value will be `${filename:equals('routes.txt')}`.
 
 After you click *APPLY*, this will create another relationship, named *routes*, to which flowfiles will be routed when their *filename* is equal to *routes.txt*.
 
 By adding another, equivalent property, for example for *stops.txt*, you would create an additional relationship, that you could use to direct the *stops.txt* file to a different path.
+
+---
+### 5. Map values to different ones
+
+Add a ***LookupRecord*** processor and connect *RouteOnAttribute* to it through the ***routes*** relationship. This new processor will perform the first transformation to the data contained within *routes.txt*.
+
+The routes.txt file contains a number of records, formatted as Comma-Separated Values (*CSV*), with the first line being the fields' names. We are interested in the following fields:
+- **route_short_name** - Equivalent to the ***line_id*** column of our table, prepared by the first processor.
+- **route_long_name** - Equivalent to ***full_name**
+- **route_type** - A number that identifies the type of vehicle, but we would rather use a self-explanatory word (like *tram* or *bus*) in our table. **We will modify this field by mapping the number to a word for the *type* column**.
+
+#### SETTINGS
+
+Put a check on *failure*.
+
+#### PROPERTIES
+
+Before regular properties, we need to create 3 controller services (for ***Record Reader***, ***Record Writer*** and ***Lookup Service***). Fortunately, their configuration is simple.
+
+##### Record Reader
+
+<img align="right" width="250" height="134" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_save.png">
+
+Click on *No value set*, expand the drop-down list and choose *Create new service...*. From the Add Controller Prompt, drop-down the *Compatible Controller Services* drop-down list and pick ***CSVReader***, then hit *CREATE*. Click <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_arrow.png"> to move to the configuration screen, answering *YES* to the prompt asking you to save changes.
+
+Click <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_arrow.png"> to configure the *CSVReader* controller service. This one interprets CSV files and you could instruct it on how to interpret *routes.txt* and even change column names, but we'll let the service derive it from the header instead.
+
+Only change these two properties: ***Schema Access Strategy*** to **Use String Fields From Header*** and ***Treat First Line as Header*** (you might have to scroll down) to ***true***.
+
+Hit *APPLY* and then enable the service through the <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_enable.png"> button.
+
+##### Record Writer
+
+Add a ***CSVRecordSetWriter*** controller service: no need to configure it, since all default values are fine, and we can enable it later.
+
+##### Lookup Service
+
+Pick ***SimpleKeyValueLookupService*** (scroll down to find it) and move to configure it. We have to create properties that will tell the processor what number should be replaced with what word.
+
+<img align="right" width="250" height="274" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_5_map.png">
+
+Add the following properties (name - value):
+- 0 - tram
+- 1 - subway
+- 2 - rail
+- 3 - bus
+- 4 - ferry
+- 5 - other
+- 6 - other
+- 7 - other
+- 11 - other
+- 12 - other
+
+Set ***Result RecordPath*** to ***/route_type***. This property tells the processor which field will have its values replaced with the mapped ones.
+
+Click *APPLY*, enable both ***CSVRecordSetWriter*** and ***SimpleKeyValueLookupService*** and return to processor configuration.
+
+Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property, named ***key*** with value ***/route_type***. This is the field used as a key in the look-up process.
+
+Since we no longer need the vehicle-identifier number after mapping it to a self-explanatory word, *route_type* acts both as key and target of the mapping process. Click *APPLY*.
+
+---
+### 6. Specific modifications to data
