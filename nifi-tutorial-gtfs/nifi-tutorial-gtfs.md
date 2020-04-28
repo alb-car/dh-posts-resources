@@ -12,6 +12,8 @@ We will download a *GTFS* (standard format for data related to public transporta
 
 We will design a process with NiFi that creates the recipient table on a Postgres database, requests and downloads the file from its HTTP address, interprets and alters the data within, and finally stores it into the recipient table.
 
+GTFS data usually comes as a zipped folder, containing multiple text files with the same format but different contents (data on routes, stops, etc.). For simplicity, we will focus on the **routes.txt** file, which contains general information on the routes provided by public transportation lines.
+
 ## Building the flow
 The basic building brick in NiFi is a ***processor***, a unit that performs a single operation on data (retrieval, modification, routing, storing, etc.).
 
@@ -73,17 +75,23 @@ The processor will appear on the flow. This type of processor executes a query o
 
 Double click on the processor to configure it.
 
+#### SETTINGS
+
 <img align="right" width="300" height="100" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_settings.png">
 
-In the ***SETTINGS*** tab, put a check mark on ***failure***, under *Automatically Terminate Relationships*, on the right side. This means that, if the operation fails, the processor should not forward the data to any of the processors we will add later.
+In the ***SETTINGS*** tab, put a check mark on ***failure***, under *Automatically Terminate Relationships*, on the right side. This means that, if the operation fails, the processor should not forward the data to any of the processors we will add later. You may also change its *Name* if you'd like to.
+
+#### SCHEDULING
 
 In the ***SCHEDULING*** tab, insert ***1 day*** under *Run Schedule*. The processor would execute once every 24 hours, starting from the moment we will decide to run it. Once the flow is complete and its execution finished, we will stop all processors, so we will not actually let it execute daily.
 
 <img align="right" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_scheduling.png">
 
-**It is however important to set it to 1 day**: if the default value, *0 sec*, is not changed on the first processor, NiFi would attempt to execute this processor as many times as possible. While it wouldn't cause any damage with this tutorial, **imagine if the first processor were to query a pay-per-use API: forgetting to set this value properly may cause thousands of useless queries, in just a few seconds, that give the same result but cost a lot of money**.
+**It is however important to set it to 1 day**: root processors are responsible for providing data to the flow, and with the default value, *0 sec*, NiFi would attempt to execute this processor as many times as possible. While it wouldn't cause any damage with this tutorial, **imagine if the first processor were to query a pay-per-use API: forgetting to set this value properly may cause thousands of useless queries, in just a few seconds, that give the same result but cost a lot of money**.
 
 *0 sec* on any non-root processor simply means that the processor should execute as soon as upstream data is available, so we only need to worry about this property for the first processor.
+
+#### PROPERTIES
 
 The ***PROPERTIES*** tab is the most unique, where configuration differs depending on processor type. **Bold** properties are required, while non-bold ones are optional. Most properties have a default value anyway, so we will only change a few of them.
 
@@ -115,3 +123,28 @@ For *Database Driver Class Name* enter `org.postgresql.Driver`, while for *Datab
 Values for *Database User* and *Password* depend on how your Postgres user is configured. If you set up a fresh Postgres installation for the tutorial, user and password are both `postgres` by default. You will notice NiFi later hides the value for *Password*.
 
 Click *APPLY* and a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_enable.png"> icon will appear: click it and click *ENABLE*. Close all prompts and double-click on the processor again so that we can finish configuring it.
+
+All that's left to do is to set the query to execute. Copy and paste the following in *SQL select query* (if you're using **variables, replace # occurrences with $**), then click *OK*:
+```
+CREATE SCHEMA IF NOT EXISTS #{schema};
+CREATE TABLE IF NOT EXISTS #{schema}.#{routes_table} (
+  line_id varchar,
+  type varchar,
+  full_name varchar,
+  shortened varchar
+);
+```
+
+<img align="right" width="400" height="176" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_configured.png">
+
+The command above will create a schema and a table. As mentioned before, we will focus on general information about public transportation lines. The table has 4 fields:
+- **line_id** - Short identifier for public transport lines, may contain letters. For buses, it's often referred to as *bus number*.
+- **type** - Bus, tram, subway, etc.
+- **full_name** - The full name of the line, usually comprised of the names of starting and ending stops.
+- **shortened** - A convenience name, which contains both the line ID and a shortened version of the name.
+
+<img align="left" width="240" height="90" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_flow.png">
+
+Click *APPLY*. The processor is fully configured, but still displays a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> icon: we need to direct *successful* output of this root processor to a new processor.
+
+### 2. Obtaining the data with a HTTP request
