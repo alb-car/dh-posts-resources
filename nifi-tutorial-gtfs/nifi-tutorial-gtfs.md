@@ -143,8 +143,82 @@ The command above will create a schema and a table. As mentioned before, we will
 - **full_name** - The full name of the line, usually comprised of the names of starting and ending stops.
 - **shortened** - A convenience name, which contains both the line ID and a shortened version of the name.
 
-<img align="left" width="240" height="90" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_flow.png">
+<img align="right" width="240" height="90" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_flow.png">
 
 Click *APPLY*. The processor is fully configured, but still displays a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> icon: we need to direct *successful* output of this root processor to a new processor.
 
 ### 2. Obtaining the data with a HTTP request
+Add a new processor, of *InvokeHTTP* type, by dragging <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> to the square-patterned area and typing "*invokehttp*" as filter.
+
+<img align="left" width="293" height="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_2_add_rel.png">
+
+This processor will perform a HTTP request to an address, receive a response (a *.zip* file) and forward its contents to another processor.
+
+Now, **hover on the root** processor and a <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_rel.png"> icon will appear: drag it to the *InvokeHTTP* processor and when its border becomes green, release it.
+
+Check **success** under *For Relationships*, on the left, and click *ADD*. When the root processor is successful, its data will now be forwarded to this *InvokeHTTP* processor, which will execute its operation.
+
+We won't actually use the data returned from the root processor (which only contains a success message), but connecting the processors this way ensures *InvokeHTTP* runs right after *ExecuteSQL*.
+
+The ExecuteSQL processor's <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> icon should change to <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png">, showing it is now valid. Let's configure *InvokeHTTP*.
+
+#### SETTINGS
+
+Check the boxes for these relationships: *Failure*, *No Retry*, *Original*, *Retry*. Sometimes it may be preferable to create a different flow branch for error relationships (to log the error, or try a different approach at the operation), but for simplicity, we will only create a branch for the successful (*Response*) relationship, so leave only that one unchecked.
+
+#### SCHEDULING
+
+Don't change anything here: *0 sec* is OK for non-root processors: it simply means it will execute immediately, as soon as the upstream processor is done.
+
+Changing this value would only make sense if there were many ***flowfiles*** (the name of data as it travels across a NiFi flow) upstream, to avoid overloading the server we're sending HTTP requests to.
+
+#### PROPERTIES
+Since we're performing a simple *GET* request, all we need to change is the ***Remote URL*** with this value:
+```
+http://www.ttesercizio.it/opendata/google_transit_urbano_tte.zip
+```
+This address will return a *.zip* file containing GTFS data for the Italian city of Trento. GTFS is a common standard for public transport data, so if this address is unavailable, you may look up data for a different city instead.
+
+Configuration for this processor is complete.
+
+### 3. Unpacking the obtained *.zip* file
+
+<img align="right" width="250" height="374" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_3_flow.png">
+
+We know the address returns a *.zip* file, so we need to unzip it. Add an ***UnpackContent*** processor and **connect the InvokeHTTP processor to this new one through the *Response* relationship**, then configure it.
+
+#### SETTINGS
+
+Check the boxes for *failure* and *original*.
+
+#### PROPERTIES
+
+Set ***Packaging Format*** to ***zip***. If you're using a different address, you may need to change it to a different value, such as ***tar***, depending on the extension you see on the address.
+
+When you don't know the archive's type, or if you want to experiment, try placing a *IdentifyMimeType* processor in-between *InvokeHTTP* and *UnpackContent*, and set ***Packaging Format*** to ***use mime.type attribute*** instead.
+
+Don't change ***File Filter***: it's to extract only specific files from the archive, but its default value ***.***\* extracts them all. While it is true that we will only handle 1 GTFS file, we are doing that for simplicity's sake and normally you would extract multiple files instead.
+
+In addition, this allows us to introduce the next processor, which is an important one.
+
+### 4. Routing flowfiles
+
+Add a ***RouteOnAttribute*** processor and connect *UnpackContent* to it through the ***success*** relationship. This new processor allows you to make the flowfiles follow a different path in the flow, depending on different factors, such as the values of their attributes.
+
+Since the *UnpackContent* processor will return multiple files, you would be able to make different GTFS files undergo different transformations, by forking the flow from this processor, with a separate path for each file to process.
+
+In this tutorial we will only set up a path for the **routes.txt** file, but additional paths are created in a similar manner.
+
+#### SETTINGS
+
+Check the only box available, *unmatched*. We will create a new relationship associated with the *routes.txt* file by adding a property.
+
+#### PROPERTIES
+
+<img align="right" width="250" height="54" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_4_properties.png">
+
+Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> to add a new property: its name will be ***routes*** and its value will be `${filename:equals('routes.txt')}`.
+
+After you click *APPLY*, this will create another relationship, named *routes*, to which flowfiles will be routed when their *filename* is equal to *routes.txt*.
+
+By adding another, equivalent property, for example for *stops.txt*, you would create an additional relationship, that you could use to direct the *stops.txt* file to a different path.
