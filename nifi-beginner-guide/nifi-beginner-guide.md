@@ -41,7 +41,7 @@ It is possible to decide what to do when an operation fails (invalid address, fi
 
 This section explains NiFi’s UI and guides you through its main features. **You do not need to worry about saving your work while working with NiFi**: every action you perform will automatically save the current state of the entire flow.
 
-Images used in this chapter refer to version 1.11 of NiFi. Previous versions may have slight differences, but they will not affect the features described here, except for the [Parameters/variables](#parameters-and-variables) section, which will explain how to handle differences depending on your version.
+Images used in this chapter refer to version 1.11 of NiFi. Previous versions may have slight differences, but they will not affect the features described here, except for the [Parameters and variables](#parameters-and-variables) section, which will explain how to handle differences depending on your version.
 
 ### Main UI
 
@@ -219,10 +219,40 @@ A different processor type may have several relationships: *failure* is a common
 
 Click *ADD* to confirm the connection.
 
-<img align="left" width="220" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_simple_flow.png">
+<img align="left" width="180" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_simple_flow.png">
 
 *GenerateFlowFile* is now valid, and the invalid symbol <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> has been replaced by <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png">, signaling that the processor is now stopped, but ready to run.
+
+You will notice a ***queue*** named *success* which contains flowfiles as they transit between the two processors.
 
 The only remaining step is to start the processor and inspect the generated flowfile.
 
 ### Inspecting flowfiles
+
+Right click on the GenerateFlowFile processor and click start. The processor’s status icon will change from <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png"> to <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_run.png"> and the processor will immediately start its task.
+
+NiFi’s graphical interface only updates at fixed intervals, so right click anywhere in the square-patterned area and click **Refresh** to see the current progress.
+
+There is now 1 file in the queue between the two processors. *GenerateFlowFile* has generated the flowfile and is now waiting for the delay configured in the *Run Schedule* property of its *SCHEDULING* tab before generating a new one.
+
+You can now stop *GenerateFlowFile* by right-clicking it and selecting *Stop*.
+
+The flowfile in the queue is not being processed by *LogAttribute*, because this processor is invalid and hence stopped.
+
+We will now **inspect the queue**. Right click on the queue between the two processors and select ***List queue***. A list of queued flowfiles will appear.
+
+<img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_queue.png">
+
+Click on <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_view.png"> to view the flowfile's contents. A new tab will open, and you will see that the content of the flowfile is `I like pizza.` (or a different value, depending on what you set for favorite).
+
+If you see `I like .`, it means NiFi did not find any parameter/variable named `favorite`. Either the parameter/variable was not created, or incorrect syntax was used while configuring the processor’s *PROPERTIES* tab.
+
+If you want to explore further on the topic of debugging, try clicking the <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_info.png"> icon to view properties and attributes of the flowfile, or click on <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_prov.png"> to see its provenance.
+
+Once you’re done inspecting the flowfile, close all prompts to return to the main NiFi UI, right-click on the queue and select ***Empty queue*** to remove all queued flowfiles. This comes in handy when you’re just confirming the output of processors, but do not want to perform further operations on flowfiles.
+
+Unfortunately, NiFi does not yet allow removing individual (instead of all) flowfiles from a queue, or inserting new ones manually, but **queues are very useful for debugging** and it’s common to stop processors to inspect flowfiles.
+
+## Conclusions
+
+We saw what NiFi can do, what it's like to work with it and explored its main features to understand how to use it. Next up is [trying it on a real use case](https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/nifi-tutorial-gtfs.md)!
