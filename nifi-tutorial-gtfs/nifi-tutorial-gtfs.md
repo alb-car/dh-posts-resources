@@ -350,13 +350,13 @@ Set ***Database Connection Pooling Service*** to the ***DBCPConnectionPool*** yo
 
 Set ***Schema Name*** to ***#{schema}*** (replace ***#*** with ***$*** if you're using variables).
 
-Set ***Table Name*** to ***#{routes_table}*** replace ***#*** with ***$*** if you're using variables).
+Set ***Table Name*** to ***#{routes_table}*** replace (***#*** with ***$*** if you're using variables).
 
 Click *APPLY*. The flow is complete and ready to run!
 
-## Running the flow
-
 <img align="right" width="200" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_full_flow.png">
+
+## Running the flow
 
 All processors should have a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png"> icon on them. If you find a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png">, hover on it to see what's wrong.
 
