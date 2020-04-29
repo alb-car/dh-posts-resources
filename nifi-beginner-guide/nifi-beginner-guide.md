@@ -133,9 +133,9 @@ You are now ready to add a processor that uses this variable.
 
 We will add and configure a processor that simply generates a ***flowfile*** containing some text. A **flowfile** is simply the name of data as it travels through the flow: it will not be saved on your computer, since we won’t add any processors to store it.
 
-The type of this processor is called *GenerateFlowFile*: it is generally useful for testing or hard-coding some values.
-
 <img align="right" width="360" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/menu_add_proc.png">
+
+The type of this processor is called *GenerateFlowFile*: it is generally useful for testing or hard-coding some values.
 
 Drag the <img width="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> icon into the square-patterned area to trigger the *Add Processor* prompt.
 
