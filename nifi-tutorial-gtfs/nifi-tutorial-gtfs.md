@@ -168,7 +168,7 @@ This processor will perform a HTTP request to an address, receive a response (a 
 
 Now, **hover on the root** processor and a <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_rel.png"> icon will appear: drag it to the *InvokeHTTP* processor and when its border becomes green, release it.
 
-Check **success** under *For Relationships*, on the left, and click *ADD*. When the root processor is successful, its data will now be forwarded to this *InvokeHTTP* processor, which will execute its operation.
+Check **success** under *For Relationships*, on the left, and click *ADD*. When the root is successful, its data will be forwarded to *InvokeHTTP*, which will execute its operation. You'll notice an arrow is pointing to *InvokeHTTP*, with a rectangle representing the ***queue*** of data between the two processors.
 
 We won't actually use the data returned from the root processor (which only contains a success message), but connecting the processors this way ensures *InvokeHTTP* runs right after *ExecuteSQL*.
 
@@ -356,7 +356,7 @@ Click *APPLY*. The flow is complete and ready to run!
 
 ## Running the flow
 
-<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_full_flow.png">
+<img align="right" width="200" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_full_flow.png">
 
 All processors should have a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png"> icon on them. If you find a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png">, hover on it to see what's wrong.
 
@@ -377,5 +377,29 @@ If everything went well, you should now find in your database a new table, named
 If any processor displays the error symbol <img width="14" height="14" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_err.png"> in the corner, something went wrong. Common issues may be an incorrect configuration of the **controller services**, especially DBCPConnectionPool, forgetting to set a **parameter/variable**, or an incorrect value for a **property**.
 
 Hover on the error icon to see what's wrong and check the processor's corresponding section in this tutorial.
+
+## Creating a template of the flow
+
+NiFi automatically saves the state of your flow at every change, but you may want to create a template out of your flow, so that you may replicate it easily, revert to its current state if you make changes, preserve it even if you delete the flow, or import it to a different NiFi instance.
+
+**Select all processors and queues in the flow**, either by holding shift and clicking them one by one, or pushing Ctrl+A.
+
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/menu_operate.png">
+
+From the *Operate* menu on the left, click <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_save_template.png"> and pick a name for the template. Click *CREATE* and *OK*.
+
+Expand the <img width="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_menu.png"> menu in the top right and select *Templates*. You can see a list of templates.
+
+If you click <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_export_template.png"> on the right, you can export your template as a XML file.
+
+You can add templates by dragging <img width="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_add_template.png"> from the top bar to the square-patterned area.
+
+The template will include processors, queues and controller services, allowing you to replicate the flow almost instantly. **Sensitive values, such as passwords, are not saved in templates**, to avoid sharing them accidentally, so you will have to enter them again (in this tutorial's example, in the *DBCPConnectionPool*'s properties).
+
+## Conclusions
+
+We learned how to build a simple flow to retrieve data from an address, route it, apply different kinds of modifications to it and store it into a database.
+
+If you want to try and make the flow a little more complicate, you can try adding a separate branch, forking from *RouteOnAttribute*, for a different GTFS file, or you can try making branches for handling errors.
 
 We hope that this tutorial has given you the tools to start building your own NiFi flows! 
