@@ -1,6 +1,6 @@
 # Apache NiFi - What it is and how to use it
 
-This article provides a guide for beginners to Apache NiFi, explaining what the software is about and guiding the user through its features and interface.
+This article provides a guide for beginners to Apache NiFi, explaining what the software is about and guiding the user through its basic features and interface.
 
 ## Introduction
 
@@ -150,3 +150,79 @@ The tag system is, unfortunately, not completely functional: **don’t type more
 Double-click the desired type and the processor will appear in the square-patterned area. Double-click it to configure it.
 
 There are 4 tabs: *SETTINGS*, *SCHEDULING*, *PROPERTIES* and *COMMENTS*. These 4 tabs are present no matter the type of the processor, but the contents of the *PROPERTIES* tab may vary significantly.
+
+#### SETTINGS
+
+<img align="right" width="280" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/settings_name.png">
+
+The only value we will change is the ***Name***. This is just for our convenience: *Name* has no impact on any feature and different processors may have the same name.
+
+#### SCHEDULING
+
+The only value we will change here is ***Run Schedule***, which indicates how often the processor will execute its task.
+
+<img align="right" width="330" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/scheduling_interval.png">
+
+The default value `0 sec` means NiFi will attempt to execute this processor as often as possible, while respecting some settings to prevent hogging resources.
+
+We only need it to execute once, so change the value to `1 day`. This way, when, later, we will start the processor, it will execute immediately once and then wait 1 day before executing again (although we will stop it to prevent it from running again the day after).
+
+This setting may seem harmless, but it is **very important: if the processor were to query a pay-per-use API, forgetting to set this value properly may cause thousands of useless queries that give the same result but cost a lot of money**.
+
+#### PROPERTIES
+
+Configuring this tab is usually more complicated than the previous tabs, but due to this processor being of *GenerateFlowFile* type, the only value we need to change is ***Custom Text***.
+
+This field decides what the processor will write inside the flowfile it generates.
+
+<img align="right" width="400" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc_properties.png">
+
+If you’re using version *1.10* or later of NiFi, then you probably configured a **parameter** named `favorite` during the [Parameters and variables](#parameters-and-variables) section of this document. With previous versions, you probably configured an equivalent **variable** of the same name.
+
+Either way, the text to input here is very similar. For parameters:
+```
+I like #{favorite}.
+```
+
+For variables, just replace `#` with `$`:
+```
+I like ${favorite}
+```
+
+Click *OK* and then click *APPLY*. This processor will generate a flowfile that contains a statement, replacing the parameter/variable `favorite` with the value you decided on during the Parameters and variables](#parameters-and-variables) section.
+
+You will notice that the processor still has the invalid symbol <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> on it and, if you hover on it, it will tell you that the *Relationship success* is invalid.
+
+This is because we still have not told NiFi what to do with the generated flowfile. In the ***SETTINGS*** tab, you probably noticed the *Automatically Terminate Relationship* section on the right.
+
+Any relationship with a tick sign here means “*when the result of your operation is <success/failure/etc.>, we don’t need the flowfile anymore and you can discard it*”.
+
+In our case, however, we would like to send the generated flowfile to another processor: in the next section we will connect *GenerateFlowFile* to a new one.
+
+### Connecting processors through a relationship
+
+We will add a second processor purely to demonstrate how to connect processors and how to inspect flowfiles, so we will not configure this new processor.
+
+Drag the <img width="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> icon to the square patterned area and add a new processor. Since we will not actually configure it, it can be practically any type, but let’s add a *LogAttribute* processor.
+
+<img align="right" width="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_rel.png">
+
+Next, hover on the *GenerateFlowFile* processor you added earlier and a <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_rel.png"> icon will appear.
+
+Drag it to the *LogAttribute* processor, which should glow green, and release it.
+
+The *Create Connection* prompt will appear. Here you decide under which circumstances *GenerateFlowFile*’s output should become the input to *LogAttribute*.
+
+Because NiFi does not expect *GenerateFlowFile* to ever fail, the only relationship available is ***success***, which is already selected.
+
+A different processor type may have several relationships: *failure* is a common one, allowing you to route data differently if the task were to fail.
+
+Click *ADD* to confirm the connection.
+
+<img align="left" width="220" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_simple_flow.png">
+
+*GenerateFlowFile* is now valid, and the invalid symbol <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> has been replaced by <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_stop.png">, signaling that the processor is now stopped, but ready to run.
+
+The only remaining step is to start the processor and inspect the generated flowfile.
+
+### Inspecting flowfiles
