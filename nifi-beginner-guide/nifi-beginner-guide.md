@@ -4,6 +4,19 @@ This article provides a guide for beginners to Apache NiFi, explaining what the 
 
 If you would like to jump straight to a tutorial on how to use NiFi for a real use case, you can do it [here](https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/nifi-tutorial-gtfs.md).
 
+## Table of contents
+
+* [Introduction](#introduction)
+  * [What is NiFi for?](#what-is-nifi-for)
+  * [What is working with NiFi like?](#what-is-working-with-nifi-like)
+* [Using NiFi](#using-nifi)
+  * [Main UI](#main-ui)
+  * [Parameters and variables](#parameters-and-variables)
+  * [Configuring a processor](#configuring-a-processor)
+  * [Connecting processors through a relationship](#connecting-processors-through-a-relationship)
+  * [Inspecting flowfiles](#inspecting-flowfiles)
+* [Conclusions](#conclusions)
+
 ## Introduction
 
 ### What is NiFi for?
