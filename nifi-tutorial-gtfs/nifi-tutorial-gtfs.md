@@ -41,19 +41,19 @@ Parameters and variables are handy to keep multiple values configured in a singl
 
 #### Parameters
 
-<img align="right" width="200" height="233" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_config.png">
+<img align="right" width="200" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_config.png">
 
 **Parameters** were introduced in **version 1.10**, with the intent of replacing variables. Users with versions >=1.10 should use parameters, while **users of previous versions should skip to the next paragraph** to add variables.
 
 Right-click in the square-patterned area and click *Configure*. Switch to the *GENERAL* tab, expand *Process Group Parameter Context* and click *Create new parameter context...*.
 
-The *Add Parameter Context* prompt will appear, with the *SETTINGS* tab selected. Enter any *Name* (for example, `Public Transport`), then switch to the *PARAMETERS* tab. Click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> and the *Add Parameter* prompt will show up.
+The *Add Parameter Context* prompt will appear, with the *SETTINGS* tab selected. Enter any *Name* (for example, `Public Transport`), then switch to the *PARAMETERS* tab. Click on <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> and the *Add Parameter* prompt will show up.
 
-<img align="right" width="260" height="143" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_parameters.png">
+<img align="right" width="260" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/pc_parameters.png">
 
 Type `schema` for *Name* and `trento` for *Value*. *Sensitive Value* indicates whether the value should be hidden, while *Description* is purely for convenience. There is no need to change these two properties.
 
-Click *APPLY*, then click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> again and add another parameter named `routes_table` with value `lines`.
+Click *APPLY*, then click on <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> again and add another parameter named `routes_table` with value `lines`.
 
 The two parameters' values will be used with Postgres, which tends to force names to lower-case. It is possible to use upper-case characters, but to keep things simple, make sure both `trento` and `lines` are lower-case.
 
@@ -63,9 +63,9 @@ Click **APPLY** until NiFi says "*Process group configuration successfully saved
 
 Right-click in the square-patterned area and click **Variables**. The *Variables* prompt will appear.
 
-Click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> and the *New Variable* prompt will appear. Insert `schema` for *Variable Name*, click *OK* and insert `trento` in the white box that appears, then click *OK*.
+Click on <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> and the *New Variable* prompt will appear. Insert `schema` for *Variable Name*, click *OK* and insert `trento` in the white box that appears, then click *OK*.
 
-Click on <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> again and add another variable, named `routes_table`, with value `lines`.
+Click on <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> again and add another variable, named `routes_table`, with value `lines`.
 
 The two parameters' values will be used with Postgres, which tends to force names to lower-case. It is possible to use upper-case characters, but to keep things simple, make sure both `trento` and `lines` are lower-case.
 
@@ -80,7 +80,7 @@ We will include creation of the recipient table in the flow, to learn something 
 
 <img align="right" width="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_add.png">
 
-Drag the <img width="25" height="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> icon from the top menu bar to the square-patterned area and release it. The *Add Processor* prompt will appear. This is where the processor type is selected. Type “*executesql*” to filter the list and double click on the **ExecuteSQL** entry.
+Drag the <img width="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> icon from the top menu bar to the square-patterned area and release it. The *Add Processor* prompt will appear. This is where the processor type is selected. Type “*executesql*” to filter the list and double click on the **ExecuteSQL** entry.
 
 The processor will appear on the flow. This type of processor executes a query on a database.
 
@@ -88,7 +88,7 @@ Double click on the processor to configure it.
 
 #### SETTINGS
 
-<img align="right" width="300" height="100" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_settings.png">
+<img align="right" width="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_settings.png">
 
 In the ***SETTINGS*** tab, put a check mark on ***failure***, under *Automatically Terminate Relationships*, on the right side. This means that, if the operation fails, the processor should not forward the data to any of the processors we will add later. You may also change its *Name* if you'd like to.
 
@@ -106,13 +106,13 @@ In the ***SCHEDULING*** tab, insert `1 day` under *Run Schedule*. The processor 
 
 The ***PROPERTIES*** tab is the most unique, where configuration differs depending on processor type. **Bold** properties are required, while non-bold ones are optional. Most properties have a default value anyway, so we will only change a few of them.
 
-<img align="right" width="260" height="232" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_add_cs.png">
+<img align="right" width="260" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_add_cs.png">
 
 Next to *Database Connection Pooling Service*, click on *No value set* to display a drop-down menu: drop down the selection and pick *Create new service...*. The *Add Controller Service* prompt will be displayed. We will use the default controller service, so click *CREATE*.
 
 You will notice the property now has the value `DBCPConnectionPool`. We need to configure this controller, so click on the arrow on the right, confirming that you want to save changes along the way.
 
-<img width="500" height="41" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_property_set.png">
+<img width="500" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_property_set.png">
 
 ***Controller services*** offer services that may be used by different processors. This one offers a connection to a database. We will later reuse this same controller service for another processor, but we only need to configure it once.
 
@@ -127,7 +127,7 @@ For example, if the database is hosted locally, at default port *5432*, and the 
 jdbc:postgresql://localhost:5432/public_transport
 ```
 
-<img align="right" width="400" height="189" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_config_cs.png">
+<img align="right" width="400" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_config_cs.png">
 
 For *Database Driver Class Name* enter `org.postgresql.Driver`, while for *Database Driver Location(s)* enter `https://jdbc.postgresql.org/download/postgresql-42.2.7.jar`.
 
@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS #{schema}.#{routes_table} (
 );
 ```
 
-<img align="right" width="400" height="176" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_configured.png">
+<img align="right" width="400" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_configured.png">
 
 The command above will create a schema and a table. As mentioned before, we will focus on general information about public transportation lines. The table has 4 fields:
 - `line_id` - Short identifier for public transport lines, may contain letters. For buses, it's often referred to as *bus number*.
@@ -154,7 +154,7 @@ The command above will create a schema and a table. As mentioned before, we will
 - `full_name` - The full name of the line, usually comprised of the names of starting and ending stops.
 - `shortened` - A name for convenience, which contains both the line ID and a shortened version of the name.
 
-<img align="right" width="240" height="90" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_flow.png">
+<img align="right" width="240" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_1_flow.png">
 
 Click *APPLY*. The processor is fully configured, but still displays a <img src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_invalid.png"> icon: we need to direct *successful* output of this root processor to a new processor.
 
@@ -162,11 +162,11 @@ Click *APPLY*. The processor is fully configured, but still displays a <img src=
 ### 2. Obtain data with a HTTP request
 Add a new processor, of ***InvokeHTTP*** type, by dragging <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/ui_proc.png"> to the square-patterned area and typing "*invokehttp*" as filter.
 
-<img align="left" width="293" height="300" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_2_add_rel.png">
+<img align="left" width="293" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_2_add_rel.png">
 
 This processor will perform a HTTP request to an address, receive a response (a *.zip* file) and forward its contents to another processor.
 
-Now, **hover on the root** processor and a <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_rel.png"> icon will appear: drag it to the *InvokeHTTP* processor and when its border becomes green, release it.
+Now, **hover on the root** processor and a <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_rel.png"> icon will appear: drag it to the *InvokeHTTP* processor and when its border becomes green, release it.
 
 Check **success** under *For Relationships*, on the left, and click *ADD*. When the root is successful, its data will be forwarded to *InvokeHTTP*, which will then run its task. You'll notice an arrow is pointing to *InvokeHTTP*, with a rectangle representing the ***queue*** of data between the two processors.
 
@@ -196,7 +196,7 @@ Configuration for this processor is complete.
 ---
 ### 3. Unpack the *.zip* file
 
-<img align="right" width="250" height="374" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_3_flow.png">
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_3_flow.png">
 
 We know the address returns a *.zip* file, so we need to unzip it. Add an ***UnpackContent*** processor and **connect the *InvokeHTTP* processor to this new one through the *Response* relationship**, then configure it.
 
@@ -229,9 +229,9 @@ Check the only box available, *unmatched*. We will create a new relationship ass
 
 #### PROPERTIES
 
-<img align="right" width="250" height="54" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_4_properties.png">
+<img align="right" width="250" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_4_properties.png">
 
-Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property: its name will be `routes` and its value will be `${filename:equals('routes.txt')}`.
+Click <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property: its name will be `routes` and its value will be `${filename:equals('routes.txt')}`.
 
 The `${...}` notation signals the use of [NiFi's Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html), a powerful tool to reference and manipulate flowfile attributes, though in this tutorial we only need it for this particular property.
 
@@ -297,7 +297,7 @@ Click *APPLY*, enable both ***CSVRecordSetWriter*** and ***SimpleKeyValueLookupS
 
 Set ***Result RecordPath*** to `/route_type`. This property tells the processor which field will have its values replaced with the mapped ones.
 
-Click <img width="22" height="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property, named `key` with value `/route_type`. This is the field used as a key in the look-up process.
+Click <img width="22" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_plus.png"> to add a new property, named `key` with value `/route_type`. This is the field used as a key in the look-up process.
 
 Since we no longer need the number after mapping it to a self-explanatory word, *route_type* acts both as key and target of the mapping process. Click *APPLY*.
 
@@ -374,7 +374,7 @@ This means your flow has finished execution and is now waiting for the `1 day` i
 
 If everything went well, you should now find in your database a new table, named ***lines*** in the new ***trento*** schema, containing several records, with the columns as we defined them earlier!
 
-If any processor displays the error symbol <img width="14" height="14" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_err.png"> in the corner, something went wrong. Common issues may be an incorrect configuration of **controller services**, especially *DBCPConnectionPool*, forgetting to set a **parameter/variable**, or an incorrect value for a **property**.
+If any processor displays the error symbol <img width="14" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/icon_err.png"> in the corner, something went wrong. Common issues may be an incorrect configuration of **controller services**, especially *DBCPConnectionPool*, forgetting to set a **parameter/variable**, or an incorrect value for a **property**.
 
 Hover on the error icon to see what's wrong and check the processor's corresponding section in this tutorial.
 
@@ -394,7 +394,9 @@ If you click <img src="https://github.com/alb-car/dh-posts-resources/blob/master
 
 You can add templates by dragging <img width="25" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_add_template.png"> from the top bar to the square-patterned area.
 
-The template will include processors, queues and controller services, allowing you to replicate the flow almost instantly. **Sensitive values, such as passwords, are not saved in templates**, so you will have to enter them again (in this tutorial's case, it's the password in the *DBCPConnectionPool*'s properties).
+The template will include processors, queues and controller services, allowing you to replicate the flow almost instantly. **Parameter contexts and sensitive values, such as passwords, are not saved in templates**, so you will have to set them again.
+
+You can download the template for this tutorial's flow [here](https://github.com/alb-car/dh-posts-resources/tree/master/misc-resources/nifi-templates). You can import templates to your NiFi instance with the <img width="20" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-beginner-guide/images/button_upload_template.png"> button from the *Operate* menu.
 
 ## Conclusions
 
