@@ -2,6 +2,22 @@
 
 This tutorial provides a step-by-step guide on how to use Apache NiFi for a simple, but realistic use case.
 
+## Table of contents
+* [Requirements](#requirements)
+* [Scenario](#scenario)
+* [Building the flow](#building-the-flow)
+  * [Parameters and variables](#parameters-and-variables)
+  * [1. Root processor: create the recipient table](#1-root-processor-create-the-recipient-table)
+  * [2. Obtain data with a HTTP request](#2-obtain-data-with-a-http-request)
+  * [3. Unpack the .zip file](#3-unpack-the-zip-file)
+  * [4. Route flowfiles](#4-route-flowfiles)
+  * [5. Map values to different ones](#5-map-values-to-different-ones)
+  * [6. Specific modifications to data](#6-specific-modifications-to-data)
+  * [7. Insert data into the database](#7-insert-data-into-the-database)
+* [Running the flow](#running-the-flow)
+* [Creating a template of the flow](#creating-a-template-of-the-flow)
+* [Conclusions](#conclusions)
+
 ## Requirements
 
 No prior experience with NiFi and its user interface is required, as every concept will be briefly introduced when necessary.
@@ -35,7 +51,7 @@ Double click on the process group to enter it. The path on the bottom will chang
 Before adding processors, we will create some parameters/variables.
 <img align="right" src="https://github.com/alb-car/dh-posts-resources/blob/master/nifi-tutorial-gtfs/images/t_path.png">
 
-### Parameters and Variables
+### Parameters and variables
 
 Parameters and variables are handy to keep multiple values configured in a single place. The flow will refer to these parameters/variables, so if we decide to change a value, we only have to update the parameter/variable once and every occurrence of it will use its new value.
 
