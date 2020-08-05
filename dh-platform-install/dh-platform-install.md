@@ -243,6 +243,23 @@ Open *configService.js* with a text editor and look for a line containing client
       clientID: 'cyclotron-client-id-here',
 ```
 
+If you are using self-signed certificates for AAC, you need to modify *cyclotron.yml* and *config.js* too.
+
+Add `- ./cert/ca:/home/cyclotron/cyclotron-svc/config/ca` under `volumes` for `cyclotron-svc` in *cyclotron.yml*, like so:
+```
+    volumes:
+      - ./cyclotron-conf/config.js:/home/cyclotron/cyclotron-svc/config/config.js
+      - ./cert/ca:/home/cyclotron/cyclotron-svc/config/ca
+```
+
+Add  `'config/ca/rootCA.crt'` within `trustedCa` in *config.js* (near the bottom of the file), like so:
+```
+    trustedCa: [
+        //'config/internalRoot.crt',
+        'config/ca/rootCA.crt'
+    ]
+```
+
 Run this to install and start Cyclotron:
 ```
 docker-compose -p platform.local -f cyclotron.yml up -d
@@ -253,6 +270,11 @@ docker-compose -p platform.local -f cyclotron.yml up -d
 Nginx's configuration file is `nginx.conf`. It contains configurations for each component. If a component is running, you need to uncomment its correspondent section. Conversely, if it is not running, you need to comment it.
 
 Lines are commented by adding a `#` symbol before it. If you're using **Notepad++** to edit the configuration, set *Language > S > Shell* and then you can comment multiple lines at once by selecting them and pressing *Ctrl+K*, or uncomment them with *Ctrl+Shift+K*.
+
+If you are using Cyclotron, add the following line within `location /api/` for Cyclotron's configuration:
+```
+      rewrite "(?i)/api/(.*)" /$1 break;
+```
 
 Every component you enabled must be inserted in the **hosts** file of your OS.\
 On **Linux**, it is located at:
