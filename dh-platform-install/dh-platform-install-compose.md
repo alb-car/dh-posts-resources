@@ -1,6 +1,6 @@
 # Installing the Digital Hub components with Docker Compose
 
-This document will guide you through the configuration and installation of the components of the *Digital Hub Platform*.
+This document will guide you through the configuration and installation of the components of the *Digital Hub Platform* with Docker Compose.
 
 **Docker** and **Docker Compose** are required.
 
