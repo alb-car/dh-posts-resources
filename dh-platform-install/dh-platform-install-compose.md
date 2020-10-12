@@ -40,6 +40,7 @@ Rename (or make a copy of) `aac.env.example` to `aac.env`. This is now the confi
 The `aac-conf/config.yaml` file contains configuration for the apps that will automatically be created for the other components. Again, you do not have to edit this file. By default, each app will be registered with the following credentials:
 - **Client ID**: *<SHORT_NAME>_CLIENT_ID*
 - **Client secret**: *<SHORT_NAME>_CLIENT_SECRET*
+
 *<SHORT_NAME>* will be *DSS*, *APIM*, *NIFI* or *CYCLOTRON* depending on the component the app is for. Keep in mind that, if you decide to change these credentials, the components' own configuration will have to be changed when you decide to launch them, as they use these values by default.
 
 Run the following, which installs and starts AAC:
