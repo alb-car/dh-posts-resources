@@ -23,7 +23,7 @@ This section describes the common scenario for data validation and provides a br
 
 ### Scenario
 
-Before processing data, we generally assume that each record has a certain structure and certain properties hold true for its contents.
+Before processing data, we generally assume that *each record has a certain structure and certain properties hold true for its contents*.
 For example, with tabular data, we expect entries to have a specific number of fields and each field to respect some rules: cannot be null, must be unique, must be a number, must follow a certain format...
 
 Whether it's due to a bug, an unforeseen edge case, a conversion between formats, or something inserted by hand, it is not rare to have invalid values. When processed, these may halt execution, propagate errors, or generate misleading statistics.
@@ -34,12 +34,12 @@ Data validation aims to find these irregularities before they become problems. T
 
 The platform we have developed is built to combine aspects of data validation and profiling, offered by pre-existing libraries, together with new features for storing and presenting the results, to ease their inspection.
 
-The data to be validated and its schema may come from several commonly used storage tools: S3, Azure, FTP...
+The data to be validated and its schema may come from several commonly used storage tools: *S3*, *Azure*, *FTP* servers...
 
 We developed the following components. This post will focus on using Datajudge and the UI, as understanding the back-end is not necessary, but if you wish to learn more about the server side, feel free to read the documentation on the repository.
-* Datajudge: a *Python* library which retrieves the data, combines the usage of pre-existing libraries for validation (currently supports [Frictionless](https://framework.frictionlessdata.io/)) and profiling (currently supports [pandas-profiling](https://github.com/pandas-profiling/pandas-profiling)) and generates a number of documents describing results, data and environment.
-* Back-end: using a MongoDB instance for storage, it provides *Spring* REST APIs for CRUD operations on the generated documents.
-* UI: developed with *React-Admin*, to inspect the documents.
+* **Datajudge**: a *Python* library which retrieves the data, combines the usage of pre-existing libraries for validation (currently supports [Frictionless](https://framework.frictionlessdata.io/)) and profiling (currently supports [pandas-profiling](https://github.com/pandas-profiling/pandas-profiling)) and generates a number of documents describing results, data and environment.
+* **Back-end**: using a MongoDB instance for storage, it provides *Spring* REST APIs for CRUD operations on the generated documents.
+* **UI**: developed with *React-Admin*, to inspect the documents.
 
 ## Requirements
 
@@ -173,7 +173,7 @@ This example will create a local file, containing a verbose report, and save an 
 
 A script performing all these operations is available [here](resources/run_datajudge.py). The `config` *dict* contains all the values that will be passed as arguments to the methods, so before executing this script, you will have to update `config` to fit your needs.
 
-All these metadata documents are stored by the back-end on the MonboDB instance it is configured to use. The back-end also provides end-points to serve these documents to the UI, which we will now use to view them.
+All these metadata documents are stored by the back-end on the *MongoDB* instance it is configured to use. The back-end also provides end-points to serve these documents to the UI, which we will now use to view them.
 
 ### UI
 
