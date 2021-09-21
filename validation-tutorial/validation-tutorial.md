@@ -179,15 +179,15 @@ All these metadata documents are stored by the back-end on the *MongoDB* instanc
 
 Open the UI instance on your browser and, after logging in, you will be welcomed to the **Dashboard**. On the left is the navigation menu, which will expand as we travel through its tree-like structure.
 
-Click on **Projects** and a list of projects will appear. Likely, it will only contain the one we used in the Datajudge section, as projects without any documents associated do not show up. You also can't see projects you do not have permissions for in the identity provider's configuration. Click on the *VIEW* button to the right.
+Click on *Projects* and a **list of projects** will appear. Likely, it will only contain the one we used in the Datajudge section, as projects without any documents associated do not show up. You also can't see projects you do not have permissions for in the identity provider's configuration. Click on the *VIEW* button to the right.
 
 You're now viewing the **project's overview** and the navigation menu has expanded. There is not much information here, so click on *Experiments*, either on the left or on the bottom.
 
-You will now see a list of *Experiments*. Unless someone else has been creating them on the same instance, it should only contain the `companies_exp` experiment we generated previously. Click on its *VIEW* button.
+You will now see a **list of experiments**. Unless someone else has been creating them on the same instance, it should only contain the `companies_exp` experiment we generated previously. Click on its *VIEW* button.
 
 As expected, the **experiment's overview** appears, with little information. Click on *Runs*.
 
-Another list is presented, this time for runs. Only `companies_run` should be present, so click on its *VIEW* button.
+The **list of runs** is presented. Only `companies_run` should be present, so click on its *VIEW* button.
 
 The **run's overview** is introduced and some summary information is presented, like the run's status or the libraries used. On the left, as well as on the bottom, you can access specific documents:
 * *Artifact metadata*: This simple section lists the persisted files and their location.
@@ -201,7 +201,7 @@ Each one contains rather self-explanatory information, so inspect them as you pl
 
 If you wish to navigate backwards and view a different run, experiment or project, simply use the left menu.
 
-If you're given a NetworkError, it's likely that you were disconnected due to inactivity as a safety measure. Simply reload the page and authenticate again.
+If you're given a *NetworkError*, it's likely that you were disconnected due to inactivity as a safety measure. Simply reload the page and authenticate again.
 
 ## Conclusion
 In this tutorial we focused on a simplified, but realistic, scenario. Given some data containing information on companies, we ran Datajudge on it, using its supported libraries for validation and profiling purposes, and generated several metadata documents, which were stored by the back-end and we viewed through the UI.
