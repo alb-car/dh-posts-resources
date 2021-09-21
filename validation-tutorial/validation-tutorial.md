@@ -55,7 +55,7 @@ An instance of [AAC](https://github.com/scc-digitalhub/AAC) is needed to act as 
 
 ### Data
 
-Obviously some data and its schema must be available, either locally or on the cloud. You can download [this sample data]() and [its schema]() to follow the tutorial.
+Obviously some data and its schema must be available, either locally or on the cloud. You can download [this sample data](resources/companies_data.csv) and [its schema](resources/companies_schema.json) to follow the tutorial.
 
 Let's look at a few rows from `companies_data.csv`:
 ```
@@ -127,11 +127,11 @@ data_resource = dj.DataResource(
 )
 ```
 
-Next is the **client**, which we link to the metadata store by entering its address and authentication for it. We also need a project ID we have rights for on AAC. In this example, the ID is `proj1`, but it may vary depending on the configuration of the AAC instance you're using. Giving a name to the experiment is optional.
+Next is the **client**, which we link to the metadata store by entering its address and authentication for it. We also need a project ID we have rights for on the identity provider. In this example, the ID is `proj1`, but it may vary depending on the configuration of the identity provider you're using. Giving a name to the experiment is optional.
 ```
 metadata_store_config = {
         "auth": "oauth",
-        "token": "your_aac_implicit_token"
+        "token": "your_implicit_token"
     }
 
 client = dj.Client(
@@ -171,15 +171,15 @@ with run:
 ```
 This example will create a local file, containing a verbose report, and save an additional, simple document in the metadata store.
 
-A script performing all these operations is available [here](). The `config` *dict* contains all the values that will be passed as arguments to the methods, so before executing this script, you will have to update `config` to fit your needs.
+A script performing all these operations is available [here](resources/run_datajudge.py). The `config` *dict* contains all the values that will be passed as arguments to the methods, so before executing this script, you will have to update `config` to fit your needs.
 
-Let's move on to the UI and inspect these documents.
+All these metadata documents are stored by the back-end on the MonboDB instance it is configured to use. The back-end also provides end-points to serve these documents to the UI, which we will now use to view them.
 
 ### UI
 
 Open the UI instance on your browser and, after logging in, you will be welcomed to the **Dashboard**. On the left is the navigation menu, which will expand as we travel through its tree-like structure.
 
-Click on **Projects** and a list of projects will appear. Likely, it will only contain the one we used in the Datajudge section, as projects without any documents associated do not show up. You also can't see projects you do not have permissions for in AAC's configuration. Click on the *VIEW* button to the right.
+Click on **Projects** and a list of projects will appear. Likely, it will only contain the one we used in the Datajudge section, as projects without any documents associated do not show up. You also can't see projects you do not have permissions for in the identity provider's configuration. Click on the *VIEW* button to the right.
 
 You're now viewing the **project's overview** and the navigation menu has expanded. There is not much information here, so click on *Experiments*, either on the left or on the bottom.
 
