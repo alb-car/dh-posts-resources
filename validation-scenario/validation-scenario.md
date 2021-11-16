@@ -48,7 +48,7 @@ In short, each record mentions the name of a specific street and the date and ti
 
 Earlier we took a look at the direct link to the data file, but [here](https://www.comune.trento.it/Aree-tematiche/Open-Data/Tipologie-di-dati/Tutti-gli-open-data/Pulizia-strade-e-relativi-divieti-di-sosta-autunno-2021) you can read some metadata that describes its contents.
 
-A number of expectations for its fields are listed: some cannot be null, some must contain a date or time with a specific format and so on. we need to convert this description into a JSON **schema** file, with a specific structure, for the validation process. The schema has been manually written and can be downloaded [here]().
+A number of expectations for its fields are listed: some cannot be null, some must contain a date or time with a specific format and so on. we need to convert this description into a JSON **schema** file, with a specific structure, for the validation process. The schema has been manually written and can be downloaded [here](https://raw.githubusercontent.com/alb-car/dh-posts-resources/master/validation-scenario/resources/street_cleaning_schema.json).
 
 Now that we know what the data is about and where to get it, and have a schema file ready, let's see what software we need.
 
@@ -91,7 +91,7 @@ Each user is assigned to a number of projects, identified by an ID. Therefore, y
 
 Once you've accessed your Nuclio instance, create a *new project* (or use a pre-existing one), call it however you'd like and create a *new function*.
 
-Then, click on **Import**, which allows you to import a YAML file that describes the function: a small *Import* button will now appear in the section below and, when clicked, will prompt you to select a file. Pass [this]() file to it, then click *Create*.
+Then, click on **Import**, which allows you to import a YAML file that describes the function: a small *Import* button will now appear in the section below and, when clicked, will prompt you to select a file. Pass [this](https://raw.githubusercontent.com/alb-car/dh-posts-resources/master/validation-scenario/resources/validate-data.yaml) file to it, then click *Create*.
 
 Both the function's code and configuration will be imported.
 
@@ -135,7 +135,7 @@ The `experimentId` field is also optional: since it is needed for the validation
 Alternatively, instead of a JSON body, a simple plain text body may be provided, containing simply the name of the file. In this case, the function only checks if it is a valid CSV file.
 
 ### Apache NiFi
-Access your NiFi instance, expand the *Operate* menu on the left, and click the *Upload Template* button. Provide the pop-up with [this]() file.
+Access your NiFi instance, expand the *Operate* menu on the left, and click the *Upload Template* button. Provide the pop-up with [this](https://raw.githubusercontent.com/alb-car/dh-posts-resources/master/validation-scenario/resources/validation_scenario.xml) file.
 
 Now that the template has been imported, you need to generate a flow with it. Drag the *Template* icon from the top to the square-patterned area and select the template you just imported (`validation-scenario`).
 
@@ -171,7 +171,7 @@ Right-click again in the square-patterned area, pick *Configure* and switch to t
 The **CSVReader**-type service is ready and just needs to be enabled: click on the lightning icon and click *Enable*.
 
 For the **DBCPConnectionPool**-type service you need to change some values; click the gear icon and switch to *Properties*:
-* `Database Connection URL`: The format of this string depends on the type of database you are using. For PostgreSQL, it's `jdbc:postgresql://database_address/database_name
+* `Database Connection URL`: The format of this string depends on the type of database you are using. For PostgreSQL, it's `jdbc:postgresql://database_address/database_name`
 * `Database Driver Class Name`: This also depends on the type of database. For PostgreSQL, it's `org.postgresql.Driver`
 * `Database Driver Location(s)`: This also depends on the type of database. For PostgreSQL, enter this address as value: `https://jdbc.postgresql.org/download/postgresql-42.2.7.jar`
 * `Database User`: Username for authentication
@@ -181,7 +181,7 @@ When you're done, click *Apply* and enable this controller service as well, then
 Finally, we must configure some processors. For security reasons, templates do not save values for *sensitive properties*, so we must fill them manually by referencing the parameters we earlier defined as *sensitive* values.
 
 The following is a list of each processor and properties you need to update:
-* `Store on MinIO`: `Access Key ID` with #{minioAccessId} and `Secret Access Key` #{minioAccessSecret}
+* `Store on MinIO`: `Access Key ID` with `#{minioAccessId}` and `Secret Access Key` with `#{minioAccessSecret}`
 * `Send e-mail`: `SMTP Password` with #{smtpPassword}
 
 Depending on the SMTP service, you may need to access the SMTP service itself to allow other applications to use the account for sending e-mails.
